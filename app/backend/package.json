@@ -1,0 +1,25 @@
+{
+  "main": "index.js",
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "export $(cat .env | xargs) && ./scripts/deploy.sh",
+    "package": "gulp package",
+    "source-zip": "gulp source-zip",
+    "test": "mocha"
+  },
+  "private": true,
+  "engines": {
+    "node": "8"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.340.0"
+  },
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-install": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sequence": "^0.4.6",
+    "gulp-zip": "^4.0.0"
+  }
+}

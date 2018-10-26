@@ -1,0 +1,23 @@
+version: 0.2
+ 
+phases:
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - cd app/frontend
+      - yarn install
+  build:
+    commands:
+      - echo Build started on `date`
+      - yarn build 
+  post_build:
+    commands:
+      - echo Build completed on `date`
+cache:
+  paths:
+    - 'node_modules/**/*'
+artifacts:
+  files:
+    - 'app/frontend/**/*'
+    - 'infra/*'
+    - 'spec-files/*-frontend.yml'

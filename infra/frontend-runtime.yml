@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Web Application Client Runtime Resources"
+Resources:
+  WebServer:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Retain"
+    Properties:
+      AccessControl: "PublicRead"
+      VersioningConfiguration:
+        Status: "Enabled"
+      WebsiteConfiguration: 
+        IndexDocument: "index.html"
+        ErrorDocument: "index.html"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${AWS::StackName}-Web-Server"
+        - Key: "Owner"
+          Value: !Ref AWS::StackName
+  BucketPolicyForWebServer:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      PolicyDocument:
+        Id: "WebServerPolicy"
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "PublicReadForGetBucketObjects"
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref WebServer
+                - /*
+      Bucket: !Ref WebServer
+Outputs:
+  NAME:
+    Value: !Ref WebServer
+    Description: "Name of the Amazon S3 bucket for website"
+  URL:
+    Value: !GetAtt [ WebServer, WebsiteURL ]
+    Description: "URL for website hosted on S3"

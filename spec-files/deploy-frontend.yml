@@ -1,0 +1,35 @@
+version: 0.2
+ 
+phases:
+  pre_build:
+    commands:
+      - echo Installing packages...
+      - |
+        apk add --update --no-cache \
+        ca-certificates \
+        openssh-client \
+        openssl \
+        python \
+        py-pip \
+        curl \
+        sed \
+        jq \
+        wget
+      - pip install awscli
+      - aws --version
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Deploy the client application...
+      - |
+        DNS_NAME=$(aws cloudformation list-exports --region us-east-1 --query 'Exports[?Name==`todos-api-url`].Value' --output text)
+        sed -i -e "s/#DNS_NAME#/${DNS_NAME}/" app/frontend/dist/todos/settings.json
+      - |
+        BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $TARGET_CLIENT_STK | jq -r '.Stacks[].Outputs[] | select(.OutputKey=="NAME") | .OutputValue')
+        aws s3 sync --exact-timestamps --delete app/frontend/dist/todos s3://${BUCKET_NAME}
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - '**/*'

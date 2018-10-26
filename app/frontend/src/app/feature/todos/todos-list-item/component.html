@@ -1,0 +1,25 @@
+<div class="d-flex align-items-center">
+  <div class="col-1">
+    <input
+      class="toggle"
+      type="checkbox"
+      (click)="onToggle(todo)"
+      [checked]="todo.completed">
+  </div>
+  <div class="col-10">
+    <label [class.completed]="todo.completed"
+           *ngIf="!editable"
+           (dblclick)="onEditable()">{{todo.title}}</label>
+    <input type="text"
+           class="editable form-control"
+           *ngIf="editable"
+           [value]="todo.title"
+           (input)="todo.title=$event.target.value"
+           (keyup.enter)="onEditable(todo)">
+  </div>
+  <div class="col-2">
+    <div (click)="onRemove(todo)">
+      <fa-icon [icon]="faTrash" size="lg" style="color:Tomato"></fa-icon>
+    </div>
+  </div>
+</div>

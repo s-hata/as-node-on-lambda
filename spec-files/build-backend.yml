@@ -1,0 +1,41 @@
+version: 0.2
+ 
+phases:
+  pre_build:
+    commands:
+      - echo Installing AWS CLI...
+      - |
+        apk add --update --no-cache \
+        ca-certificates \
+        openssh-client \
+        openssl \
+        python \
+        py-pip \
+        curl \
+        sed \
+        jq \
+        wget
+      - pip install awscli
+      - aws --version
+      - echo Installing source NPM dependencies...
+      - cd app/backend
+      - yarn install
+  build:
+    commands:
+      - echo Build started on `date`
+      - node_modules/.bin/gulp
+      - |
+        aws cloudformation package \
+          --template-file ./sam.yml \
+          --s3-bucket ${S3_BUCKET_NAME} \
+          --output-template-file ./dist/packaged-sam.yml
+  post_build:
+    commands:
+      - echo Build completed on `date`
+cache:
+  paths:
+    - 'node_modules/**/*'
+artifacts:
+  files:
+    - 'app/backend/**/*'
+    - 'spec-files/*-backend.yml'

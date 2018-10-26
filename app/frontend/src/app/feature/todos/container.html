@@ -1,0 +1,16 @@
+<div class="row">
+  <app-todo-form (add)="onAdd($event)" class="w-100"></app-todo-form>
+</div>
+<div class="row" *ngIf="message$ | async">
+  <div class="alert alert-danger d-flex w-100 flex-row" role="alert">
+    <div>{{ message$ | async }}</div>
+  </div>
+</div>
+<div class="row">
+  <app-todo-list
+    class="w-100"
+    [todos]="todos$ | async"
+    (remove)="onRemove($event)"
+    (toggle)="onToggle($event)">
+  </app-todo-list>
+</div>

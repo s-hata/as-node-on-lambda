@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Serverless Weather Application (Exercise 10)
+
+Resources:
+  SequencesTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: name
+        Type: String
+
+  TodosTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+
+  ListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 512
+      Timeout: 10
+      CodeUri: dist/lambda.zip
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:*
+          Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TodosTable}'
+      Environment:
+        Variables:
+          TODOS_TABLE: !Ref TodosTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: GET        
+
+  CreateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: create.handler
+      Runtime: nodejs8.10
+      MemorySize: 512
+      Timeout: 10
+      CodeUri: dist/lambda.zip
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:*
+          Resource:
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TodosTable}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SequencesTable}'
+      Environment:
+        Variables:
+          TODOS_TABLE: !Ref TodosTable
+          SEQUENCES_TABLE: !Ref SequencesTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: POST
+
+  DeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: delete.handler
+      Runtime: nodejs8.10
+      MemorySize: 512
+      Timeout: 10
+      CodeUri: dist/lambda.zip
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:*
+          Resource:
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TodosTable}'
+      Environment:
+        Variables:
+          TODOS_TABLE: !Ref TodosTable
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /todos/{id}
+            Method: DELETE
+
+Outputs:
+  Todos:
+    Description: URL of your API endpoint
+    Export:
+      Name: !Sub '${AWS::StackName}-api-url'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/todos'

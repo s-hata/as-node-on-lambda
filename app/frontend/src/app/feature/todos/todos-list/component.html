@@ -1,0 +1,16 @@
+<div *ngIf="todos.size > 0">
+  <div class="alert alert-light d-flex w-100 flex-row" role="alert">
+    <span class="todo-count"><strong>{{leftTodos().size}}</strong> {{leftTodos().size == 1 ? 'item' : 'items'}} left</span>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let todo of todos" 
+      class="list-group-item"
+      [class.completed]="todo.completed">
+      <app-todo-list-item
+        [todo]="todo"
+        (toggle)="onToggle($event)"
+        (remove)="onRemove($event)">
+      </app-todo-list-item>
+    </li>
+  </ul>
+</div>
