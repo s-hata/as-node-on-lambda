@@ -4,7 +4,11 @@ SCRIPT_NAME=$( basename $0 )
 SCRIPT_DIR=$( cd $(dirname $0) && pwd -P )
 ROOT_DIR=$( cd $SCRIPT_DIR && cd .. && pwd -P)
 
-echo "build ..."
+echo "build starting ..."
+if [ ! -d "${ROOT_DIR}/node_modules" ]; then
+  echo "  [error] dependencies not installed! run 'yarn install'."
+  exit 1
+fi
 ${ROOT_DIR}/node_modules/.bin/gulp
 
 echo "create the package ..."
