@@ -21,7 +21,7 @@ exports.handler = function (request, context, callback) {
         headers: {
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data.Items),
         statusCode: 200
       });
     }

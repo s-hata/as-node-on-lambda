@@ -22,14 +22,21 @@ phases:
       - echo Build started on `date`
       - echo Deploy the client application...
       - |
-        DNS_NAME=$(aws cloudformation list-exports --region us-east-1 --query 'Exports[?Name==`todos-api-url`].Value' --output text)
-        sed -i -e "s/#DNS_NAME#/${DNS_NAME}/" app/frontend/dist/todos/settings.json
+        DNS_NAME=$(aws cloudformation describe-stacks --stack-name $TARGET_SERVER_STK | jq -r '.Stacks[].Outputs[] | select(.OutputKey=="Todos") | .OutputValue')
+        sed -i -e "s|#DOMAIN#|${DNS_NAME}|" app/frontend/dist/todos/settings.json
       - |
         BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $TARGET_CLIENT_STK | jq -r '.Stacks[].Outputs[] | select(.OutputKey=="NAME") | .OutputValue')
         aws s3 sync --exact-timestamps --delete app/frontend/dist/todos s3://${BUCKET_NAME}
   post_build:
     commands:
       - echo Build completed on `date`
+      - |
+        aws dynamodb put-item --table-name SequencesTable --item '{"name": {"S":"Todos"},"current_number": {"N":"5"}}'
+        aws dynamodb put-item --table-name Todos --item '{"id": {"S":"1"},"title": {"S":"Lambda Functionを実装する"}, "complete": {"BOOL": false}}'
+        aws dynamodb put-item --table-name Todos --item '{"id": {"S":"2"},"title": {"S":"UIを設計する"}, "complete": {"BOOL": false}}'
+        aws dynamodb put-item --table-name Todos --item '{"id": {"S":"3"},"title": {"S":"UIのコンポーネントとユニットテストを実装る"}, "complete": {"BOOL": false}}'
+        aws dynamodb put-item --table-name Todos --item '{"id": {"S":"4"},"title": {"S":"E2Eテストを実装る"}, "complete": {"BOOL": false}}'
+        aws dynamodb put-item --table-name Todos --item '{"id": {"S":"5"},"title": {"S":"ユニットテストをリファクタリングする"}, "complete": {"BOOL": false}}'
 artifacts:
   files:
     - '**/*'

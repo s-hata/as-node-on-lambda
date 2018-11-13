@@ -3,10 +3,18 @@ Transform: AWS::Serverless-2016-10-31
 
 Description: Serverless Weather Application (Exercise 10)
 
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+    Cors:
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
+
 Resources:
   SequencesTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
+      TableName: "SequencesTable"
       PrimaryKey:
         Name: name
         Type: String
@@ -14,6 +22,7 @@ Resources:
   TodosTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
+      TableName: "Todos"
       PrimaryKey:
         Name: id
         Type: String
@@ -102,4 +111,4 @@ Outputs:
     Description: URL of your API endpoint
     Export:
       Name: !Sub '${AWS::StackName}-api-url'
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/todos'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
